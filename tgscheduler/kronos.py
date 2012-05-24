@@ -397,7 +397,10 @@ class Scheduler(object):
         if self.running:
             self._acquire_lock()
             try:
-                self.sched.cancel(task.event)
+                try:
+                    self.sched.cancel(task.event)
+                except ValueError, e:
+                    log.debug("Could not cancel event %s. May have expired", task)
                 if task.name and task.name in self.tasks:
                     del self.tasks[task.name]
             finally:
